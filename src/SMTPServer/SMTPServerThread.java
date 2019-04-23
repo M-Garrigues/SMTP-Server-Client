@@ -1,7 +1,5 @@
 package SMTPServer;
 
-import Utils.DB;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -86,13 +84,16 @@ public class SMTPServerThread extends Thread{
         try{
             String input = in.readLine();
             String[] params = input.split(" ", 2);
+            for (String param: params) {
+                System.out.println(param);
+            }
             if(params[0].equals("MAIL")){
-                int firstDelimiterIndex = params[2].indexOf("FROM:<"), lastDelimiterIndex = params[2].lastIndexOf("@bestsmtpserver.com>");
+                int firstDelimiterIndex = params[1].indexOf("FROM:<"), lastDelimiterIndex = params[1].lastIndexOf("@bestsmtpserver.com>");
                 if(firstDelimiterIndex < 0 || lastDelimiterIndex < 0){
                     print("550 mailbox unavailable");
                 }
                 else{
-                    String userName = params[2].substring(firstDelimiterIndex+6, lastDelimiterIndex);
+                    String userName = params[1].substring(firstDelimiterIndex+6, lastDelimiterIndex);
                     if(!userName.equals("user1") && !userName.equals("user2") && !userName.equals("user3")){
                         print("550 no such user");
                     }
@@ -119,12 +120,12 @@ public class SMTPServerThread extends Thread{
             String input = in.readLine();
             String[] params = input.split(" ", 2);
             if(params[0].equals("RCPT")){
-                int firstDelimiterIndex = params[2].indexOf("TO:<"), lastDelimiterIndex = params[2].lastIndexOf("@bestsmtpserver.com>");
+                int firstDelimiterIndex = params[1].indexOf("TO:<"), lastDelimiterIndex = params[1].lastIndexOf("@bestsmtpserver.com>");
                 if(firstDelimiterIndex < 0 || lastDelimiterIndex < 0){
                     print("550 mailbox unavailable");
                 }
                 else{
-                    String userName = params[2].substring(firstDelimiterIndex+4, lastDelimiterIndex);
+                    String userName = params[1].substring(firstDelimiterIndex+4, lastDelimiterIndex);
                     if(!userName.equals("user1") && !userName.equals("user2") && !userName.equals("user3")){
                         print("550 no such user");
                     }
@@ -169,10 +170,13 @@ public class SMTPServerThread extends Thread{
                 currentMail += input + "\n";
 
                 if(isMessageComplete){
+                    print(currentMail);
+
                     //Ecriture du message dans la boîte de chaque recipient
                     for(String recipient : currentMailRecipients){
-                        int currentMessageNumber = DB.STAT(recipient)[0];
-                        String fileName = "Utils.DB/" + recipient + "/" + recipient + "_" + (currentMessageNumber+1) + ".txt";
+                        //int currentMessageNumber = DB.STAT(recipient)[0];
+                        //String fileName = "Utils.DB/" + recipient + "/" + recipient + "_" + (currentMessageNumber+1) + ".txt";
+                        String fileName = "Utils.DB/" + recipient + "/" + recipient + "_" + (1+1) + ".txt";
                         File file = new File(fileName);
                         file.createNewFile();
                         FileOutputStream fos = new FileOutputStream(file, true);

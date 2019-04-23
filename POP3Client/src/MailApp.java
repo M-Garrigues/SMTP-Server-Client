@@ -242,7 +242,7 @@ public class MailApp {
 
         try {
             nbNewMessages = client.getNumberOfNewMessages();
-            messages = client.getMessages();
+            //messages = client.getMessages();
         }
         catch(IOException ex)
         {

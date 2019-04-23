@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SMTPServer {
-    private static final int PORT = 5443;
+    private static final int PORT = 25;
 
     public static void main(String[] args) throws IOException {
         List<SMTPServerThread> SMTPServerThreads = new ArrayList<>();
