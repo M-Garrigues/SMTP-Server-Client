@@ -15,6 +15,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import javax.mail.Session;
 import java.io.IOException;
 import java.util.*;
 
@@ -43,10 +44,10 @@ public class MailApp {
 
 
         Group root = new Group();
-        String serv1 = "vide";
-        String serv2 = "vide";
+        String serv1 = "localhost";
+        String serv2 = "";
         String mailTo1 = "mailto@machin.bidule";
-        String mailTo2 = "mailto@machin.bidule";
+        String mailTo2 = "";
         String ip = "192.168.43.199";
         String subject = "Subject";
         String body = "\n";
@@ -93,7 +94,23 @@ public class MailApp {
         error_label.setTextFill(Color.RED);
         Button button_connexion = new Button("Envoi");
         button_connexion.setOnAction(e -> {
-        Map<String,String> receivers = getMailadresses();
+        Map<String,List<String>> receivers = getMailadresses();
+            for (String host : receivers.keySet())
+            {
+                for (String mail: receivers.get(host))
+                {
+                    Properties props = System.getProperties();
+
+                    props.put("mail.smtp.host", host);
+                    props.put("mail.smtp.auth", "false");
+                    props.put("mail.debug", "false");
+
+
+                    Session session = Session.getInstance(props, null);
+
+                    Client.sendEmail(session, mail,input_sub.getText(), input_body.getText());
+                }
+            }
         });
 
 
@@ -123,19 +140,14 @@ public class MailApp {
 
 
     }
-    public Map<String,String> getMailadresses()
+    public Map<String,List<String>> getMailadresses()
     {
-        Map<String,String> result = new HashMap<String, String>();
-        for(String mail : input_mail1.getText().split(";"))
-        {
-            result.put(mail,input_serv1.getText());
+        Map<String,List<String>> result = new HashMap<String, List<String>>();
 
-        }
-        for(String mail : input_mail2.getText().split(";"))
-        {
-            result.put(mail,input_serv2.getText());
-        }
-
+        List<String> a = Arrays.asList(input_mail1.getText().split(";"));
+        result.put(input_serv1.getText(),a);
+        a =Arrays.asList(input_mail2.getText().split(";"));
+        result.put(input_serv2.getText(),a);
         System.out.println(result.toString());
         return result;
 
