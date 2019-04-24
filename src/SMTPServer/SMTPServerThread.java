@@ -168,7 +168,9 @@ public class SMTPServerThread extends Thread{
             while(!isMessageComplete){
                 String input = in.readLine();
                 isMessageComplete = input.equals(".");
-                currentMail += input + "\n";
+
+                if(!input.equals("MIME-Version: 1.0") && !input.equals("."))
+                    currentMail += input + "\n";
 
                 if(isMessageComplete){
                     print(currentMail);

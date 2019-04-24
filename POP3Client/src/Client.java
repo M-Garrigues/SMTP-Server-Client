@@ -50,6 +50,9 @@ public class Client extends Observable {
         Properties props = System.getProperties();
 
         props.put("mail.smtp.host", smtpHostServer);
+        props.put("mail.smtp.auth", "false");
+        props.put("mail.debug", "false");
+
 
         Session session = Session.getInstance(props, null);
 
@@ -61,13 +64,13 @@ public class Client extends Observable {
         {
             MimeMessage msg = new MimeMessage(session);
             //set message headers
-            msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
+            msg.addHeader("Content-type", "text/HTML; charset=iso-8859-1");
             msg.addHeader("format", "flowed");
             msg.addHeader("Content-Transfer-Encoding", "8bit");
 
-            msg.setFrom(new InternetAddress("user1@bestsmtpserver.com", "NoReply-JD"));
+            msg.setFrom(new InternetAddress("user1@bestsmtpserver.com", "USER1"));
 
-            msg.setReplyTo(InternetAddress.parse("user1@bestsmtpserver.com", false));
+            //msg.setReplyTo(InternetAddress.parse("user1@bestsmtpserver.com", false));
 
             msg.setSubject(subject, "UTF-8");
 
