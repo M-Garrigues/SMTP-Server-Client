@@ -16,19 +16,19 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 public class MailApp {
 
 
-    Client client = new Client();
-    List<Message> messages;
-    int nbNewMessages = 0;
     Label error_label;
-    TextField input_user;
-    TextField input_ip;
-    TextField input_port;
-    PasswordField input_password;
+    TextField input_mail1;
+    TextField input_mail2;
+    TextField input_serv1;
+    TextField input_serv2;
+    TextField input_sub;
+    TextArea input_body;
+
     String errorMessage;
     public MailApp(Stage stage) {
 
@@ -36,15 +36,20 @@ public class MailApp {
 
 
         stage.setTitle("POP3 Client");
-        stage.setWidth(600);
-        stage.setHeight(180);
+        stage.setWidth(720);
+        stage.setHeight(400);
 
 
 
 
         Group root = new Group();
-        String username = "username";
+        String serv1 = "vide";
+        String serv2 = "vide";
+        String mailTo1 = "mailto@machin.bidule";
+        String mailTo2 = "mailto@machin.bidule";
         String ip = "192.168.43.199";
+        String subject = "Subject";
+        String body = "\n";
         int port = 5442;
 
         BorderPane container = new BorderPane();
@@ -52,122 +57,53 @@ public class MailApp {
 
         // zone de changement de port et ip du serveur distant
         HBox hBox1 = new HBox();
-        Label label_user = new Label(" Username : ");
-        hBox1.getChildren().add(label_user);
-        input_user = new TextField(username);
-        hBox1.getChildren().add(input_user);
+        Label label_serv1 = new Label(" Receiver server : ");
+        hBox1.getChildren().add(label_serv1);
+        input_serv1 = new TextField(serv1);
+        hBox1.getChildren().add(input_serv1);
+        Label label_mail = new Label(" Receiver email : ");
+        hBox1.getChildren().add(label_mail);
+        input_mail1 = new TextField(mailTo1);
+        hBox1.getChildren().add(input_mail1);
+        HBox hBox1bis = new HBox();
+        Label label_serv2 = new Label(" Receiver server : ");
+        hBox1bis.getChildren().add(label_serv2);
+        input_serv2 = new TextField(serv2);
+        hBox1bis.getChildren().add(input_serv2);
+        Label label_mail2 = new Label(" Receiver email : ");
+        hBox1bis.getChildren().add(label_mail2);
+        input_mail2 = new TextField(mailTo2);
+        hBox1bis.getChildren().add(input_mail2);
 
         HBox hBox2 = new HBox();
-        Label label_password = new Label(" Password :  ");
-        hBox2.getChildren().add(label_password);
-        input_password = new PasswordField();
-        hBox2.getChildren().add(input_password);
-
+        Label label_sub = new Label(" Subject ");
+        hBox2.getChildren().add(label_sub);
+        input_sub = new TextField(subject);
+        hBox2.getChildren().add(input_sub);
         HBox hBox3 = new HBox();
-        Label label_ip = new Label(" SMTPServer IP :   ");
-        hBox3.getChildren().add(label_ip);
-        input_ip = new TextField(ip);
-        hBox3.getChildren().add(input_ip);
-        Label label_port = new Label("  SMTPServer Port : ");
-        hBox3.getChildren().add(label_port);
-        input_port = new TextField(Integer.toString(port));
-        hBox3.getChildren().add(input_port);
+        Label label_body = new Label("  Body : ");
+
+        hBox3.getChildren().add(label_body);
+        input_body = new TextArea(body);
+
+        hBox3.getChildren().add(input_body);
 
         HBox hBox4 = new HBox();
         error_label = new Label("");
         error_label.setTextFill(Color.RED);
-        Button button_connexion = new Button("Connexion");
+        Button button_connexion = new Button("Envoi");
         button_connexion.setOnAction(e -> {
-
-            error_label.setText("  ");
-            try
-            {
-                connect();
-            }
-            catch (IOException ex)
-            {
-                error_label.setText(" " +errorMessage);
-            }
-            if(client.isAuthentificated())
-            {
-                try
-                {
-                    refreshMessages();
-                }
-                catch (IOException ex)
-                {
-                    error_label.setText(" " + errorMessage);
-                }
-
-                if(nbNewMessages != 0)
-                {
-                    ScrollPane list_mail =new ScrollPane();
-                    list_mail.setFitToHeight(true);
-                    list_mail.setFitToWidth(false);
-                    Label contentMail = new Label();
-                    contentMail.setWrapText(true);
-                    contentMail.setMaxWidth(540);
-                    contentMail.setMinWidth(540);
-                    list_mail.setPrefSize(300,350);
-                    VBox vBoxMail = new VBox();
-
-                    for(int i = 0; i< nbNewMessages;i++)
-                    {
-                        final int j = i;
-                        StackPane s = new StackPane();
-                        Rectangle r = new Rectangle(300,70);
-                        r.setFill(Color.LIGHTGRAY);
-                        r.setStroke(Color.BLACK);
-                        s.setOnMouseClicked(new EventHandler<MouseEvent>()
-                        {
-                            @Override
-                            public void handle(MouseEvent t) {
-
-                                r.setFill(Color.WHITE);
-                                contentMail.setText(messages.get(j).getBody());
-                            }
-                        });
-                        Label l = new Label("From : " + messages.get(i).getHeaders().get("From").toString() +"\n Subject : "+ messages.get(i).getHeaders().get("Subject").toString());
-                        s.getChildren().addAll(r,l);
-                        vBoxMail.getChildren().add(s);
-                    }
-
-                    list_mail.setContent(vBoxMail);
-                    BorderPane secondaryLayout = new BorderPane();
-                    secondaryLayout.setLeft(list_mail);
-                    secondaryLayout.setRight(contentMail);
-                    Scene secondScene = new Scene(secondaryLayout, 900, 350);
-
-                    // New window (Stage)
-                    Stage newWindow = new Stage();
-                    newWindow.setTitle("Display Email");
-                    newWindow.setScene(secondScene);
-
-                    newWindow.show();
-                    newWindow.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                        public void handle(WindowEvent we) {
-                            try {
-                                quit();
-                            }
-                            catch(IOException e)
-                            {
-
-                            }
-
-                        }
-                    });
-
-                }
-            }
-
-
-
-
+        Map<String,String> receivers = getMailadresses();
         });
+
+
+
+
 
         hBox4.getChildren().add(button_connexion);
         hBox4.getChildren().add(error_label);
         vBox.getChildren().add(hBox1);
+        vBox.getChildren().add(hBox1bis);
         vBox.getChildren().add(hBox2);
         vBox.getChildren().add(hBox3);
         vBox.getChildren().add(hBox4);
@@ -175,10 +111,6 @@ public class MailApp {
 
 
         container.setTop(vBox);
-
-
-
-
 
 
         root.getChildren().add(container);
@@ -189,65 +121,26 @@ public class MailApp {
         container.setPrefHeight(scene.getHeight());
         container.setPrefWidth(scene.getWidth());
 
-        ErrorView errorView = new ErrorView(stage);
-        client.addObserver(errorView);
+
     }
-
-
-
-
-    public void connect() throws IOException {
-
-        assert !client.isConnected() : "Client is already connnected";
-
-        //checkChampsRemplis, erreur sinon
-
-        String host = input_ip.getText();
-        int port = Integer.parseInt(input_port.getText());
-        String username = input_user.getText();
-        String password = input_password.getText();
-
-        if (client.connectToHost(host, port)){
-
-            String timestamp = client.getTimeStamp();
-
-            if( client.sendAPOP(username, password, timestamp)){
-
-                //PASSER AU STAGE 2;
-            }else{
-                errorMessage = "Authentification failed.";
-                throw new IOException();
-            }
-        }else{
-            client.disconnect();
-
-            errorMessage = "Can not reach server. Verify ip and port are correctly configured.";
-            throw new IOException();
-        }
-    }
-
-    public void quit()throws IOException{
-
-        //Fonctions en plus
-        disconnect();
-    }
-
-    public void disconnect()throws IOException{
-
-        client.logout();
-        client.disconnect();
-    }
-
-    public void refreshMessages() throws  IOException{
-
-        try {
-            nbNewMessages = client.getNumberOfNewMessages();
-            //messages = client.getMessages();
-        }
-        catch(IOException ex)
+    public Map<String,String> getMailadresses()
+    {
+        Map<String,String> result = new HashMap<String, String>();
+        for(String mail : input_mail1.getText().split(";"))
         {
-            errorMessage = "Cannot load messages";
+            result.put(mail,input_serv1.getText());
+
         }
+        for(String mail : input_mail2.getText().split(";"))
+        {
+            result.put(mail,input_serv2.getText());
+        }
+
+        System.out.println(result.toString());
+        return result;
+
+
+
     }
 }
 
