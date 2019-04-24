@@ -16,6 +16,7 @@ public class SMTPServerThread extends Thread{
     private String currentUser = "";
     private String currentMail;
     private ArrayList<String> currentMailRecipients;
+    private String rootPath = "C:\\IPC\\Mailbox";
 
     public SMTPServerThread(Socket socket) throws IOException {
         this.serverState = SMTPStateEnum.STOPPED;
@@ -176,7 +177,9 @@ public class SMTPServerThread extends Thread{
                     for(String recipient : currentMailRecipients){
                         //int currentMessageNumber = DB.STAT(recipient)[0];
                         //String fileName = "Utils.DB/" + recipient + "/" + recipient + "_" + (currentMessageNumber+1) + ".txt";
-                        String fileName = "Utils.DB/" + recipient + "/" + recipient + "_" + (1+1) + ".txt";
+                        int nbFiles = new File(rootPath+"/"+recipient).list().length;
+                        String fileName = rootPath+"/"+recipient+"/"+recipient+"_mail_"+(nbFiles+1)+".txt";
+                       // String fileName = "Utils.DB/" + recipient + "/" + recipient + "_" + (1+1) + ".txt";
                         File file = new File(fileName);
                         file.createNewFile();
                         FileOutputStream fos = new FileOutputStream(file, true);
